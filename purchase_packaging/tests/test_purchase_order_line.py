@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2017 ACSONE SA/NV (<http://acsone.eu>)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 import odoo.tests.common as common
@@ -124,14 +123,14 @@ class TestPurchaseOrderLine(common.SavepointCase):
             'order_id': po
         })
         po_line.onchange_product_id()
-        self.assertEquals(
+        self.assertEqual(
             self.product_packaging_dozen.uom_id,
             po_line.product_uom,
             'The UOM Unit is not well set'
         )
         po_line.packaging_id = self.product_packaging_unit
         po_line._onchange_packaging_id()
-        self.assertEquals(
+        self.assertEqual(
             self.product_packaging_unit.uom_id,
             po_line.product_uom,
             'The product uom is not well set'
@@ -152,7 +151,7 @@ class TestPurchaseOrderLine(common.SavepointCase):
             'order_id': po
         })
         po_line.onchange_product_id()
-        self.assertEquals(
+        self.assertEqual(
             16.0,
             po_line.product_qty,
         )
@@ -160,7 +159,7 @@ class TestPurchaseOrderLine(common.SavepointCase):
         po_line.product_id.seller_ids = self.env[
             'product.supplierinfo'].browse()
         po_line.product_qty = 2.0
-        self.assertEquals(
+        self.assertEqual(
             2.0,
             po_line.product_qty,
         )
@@ -182,7 +181,7 @@ class TestPurchaseOrderLine(common.SavepointCase):
         po_line.onchange_product_id()
         vals = po_line._convert_to_write(po_line._cache)
         po_line = po_line.create(vals)
-        self.assertEquals(
+        self.assertEqual(
             16.0,
             po_line.product_qty,
         )
@@ -190,7 +189,7 @@ class TestPurchaseOrderLine(common.SavepointCase):
         po_line.product_id.seller_ids = self.env[
             'product.supplierinfo'].browse()
         po_line.product_qty = 2.0
-        self.assertEquals(
+        self.assertEqual(
             2.0,
             po_line.product_qty,
         )
@@ -212,13 +211,13 @@ class TestPurchaseOrderLine(common.SavepointCase):
         po_line.onchange_product_id()
         vals = po_line._convert_to_write(po_line._cache)
         po_line = po_line.create(vals)
-        self.assertEquals(
+        self.assertEqual(
             16.0,
             po_line.product_qty,
         )
         po_line.product_purchase_uom_id = self.env.ref(
             'product.product_uom_unit')
-        self.assertEquals(
+        self.assertEqual(
             2.0,
             po_line.product_qty,
         )
