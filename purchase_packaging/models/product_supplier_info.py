@@ -12,7 +12,7 @@ class ProductSupplierinfo(models.Model):
 
     packaging_id = fields.Many2one(
         'product.packaging',
-        'Logisitical Units'
+        'Logistical Units'
     )
     product_uom = fields.Many2one(
         compute='_compute_product_uom',
