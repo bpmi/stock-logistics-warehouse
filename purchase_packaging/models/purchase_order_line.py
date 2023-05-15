@@ -11,11 +11,11 @@ class PurchaseOrderLine(models.Model):
     def _default_product_purchase_uom_id(self):
         return self.env.ref('product.product_uom_unit')
 
-    product_tmpl_id = fields.Many2one(
-        related='product_id.product_tmpl_id',
-        comodel_name='product.template',
-        readonly=True
-    )
+    # product_tmpl_id = fields.Many2one(
+    #     related='product_id.product_tmpl_id',
+    #     comodel_name='product.template',
+    #     readonly=True
+    # )
     packaging_id = fields.Many2one(
         'product.packaging',
         'Packaging'
@@ -98,13 +98,18 @@ class PurchaseOrderLine(models.Model):
 
     @api.onchange("packaging_id")
     def _onchange_packaging_id(self):
+        """When Packaging field changes:
+        1. Update the Product Unit of Measure.
+        2. If a Partner has been selected, look for any packaging/price combinations that match this supplier
+           """
         if self.packaging_id:
             self.product_uom = self.packaging_id.uom_id
+            # If Supplier is selected, look for Packagings that match this product and
 
     @api.onchange('product_id')
     def onchange_product_id(self):
         """ set domain on product_purchase_uom_id and packaging_id
-            set the first packagigng, purchase_uom and purchase_qty
+            set the first packaging, purchase_uom and purchase_qty
         """
         domain = {}
         # call default implementation
@@ -116,20 +121,53 @@ class PurchaseOrderLine(models.Model):
         self.product_purchase_uom_id = self.product_purchase_uom_id.browse(
             defaults.get('product_purchase_uom_id', []))
         # add default domains
-        if self.product_id and self.partner_id:
-            domain['packaging_id'] = [
-                ('id', 'in', self.product_id.mapped(
-                    'seller_ids.packaging_id.id'))]
+        if self.product_id:
+            if self.partner_id:
+                # search() for a recordset from product_supplierinfo with entries that match the current product and
+                # supplier, and then use the mapped() method to create a list of the packaging_ids
+                packaging_ids = self.env['product.supplierinfo'].search(
+                    ['&', ('product_id', '=', self.product_id.id), ('name', '=', self.partner_id.id)]
+                ).mapped('packaging_id.id')
+
+
+
+                # product_supplierinfo_ids = self.env['product.supplierinfo'].search(
+                #     [('product_id', '=', self.product_id.id)])
+                # packaging_ids = product_supplierinfo_ids.mapped('packaging_id')
+                #
+                # packaging_ids = self.env['product.supplierinfo'].search(
+                #     [('product_id', '=', self.product_id.id)]).mapped(
+                #     'packaging_id')
+
+                # supplierinfo_ids = [supplierinfo.id for supplierinfo in product_supplierinfo_ids]
+                # supplierinfo_ids = product_supplierinfo_ids.mapped('id')
+
+                # supplierinfo_ids = self.env['product.supplierinfo'].search(
+                #     ['&', ('product_id', '=', self.product_id.id), ('name', '=', self.partner_id.id)]).mapped('id')
+
+
+            else:
+                # there is no partner set for this purchase order, so return all packages related to this product
+                packaging_ids = self.env['product.packaging'].search(
+                    [('product_id', '=', self.product_id.id)]
+                ).mapped('id')
+
+            domain['packaging_id'] = [('id', 'in', packaging_ids)]
             domain['product_purchase_uom_id'] = \
                 [('id', 'in', self.product_id.mapped(
                     'seller_ids.min_qty_uom_id.id'))]
+
         res = super(PurchaseOrderLine, self).onchange_product_id()
         if self.product_id:
             supplier = self._get_product_seller()
         else:
-            supplier = self.product_id.seller_ids.browse([])
+            supplier = self.product_id.seller_ids.browse([]) # why would this ever amount to anything? We've already determined that there's no self.product_id? Currently returns and empty set.
         if supplier.product_uom:
-            # use the uom from the suppleir
+            # use the uom from the supplier
+            # yes, but there can also be UoMs that do not have a packaging_id (e.g. min qty: 1 uom: Dozen(s) and then a price (no packaging_id). Why should we set it to the one that has a packaging_id vs. the one that doesn't? Well, b/c this is the purchase_packaging
+            # model, and the idea is to make it easier to purchase things in packages, and therefore we can assume that either the user has everything purchased in packages or at least places heavy emphasis on purchasing by package.
+
+            # we do however need to make sure that the uom from the supplier matches the Packaging (packaging_id) that has been set in this order line.
             self.product_uom = supplier.product_uom
         if supplier.min_qty_uom_id:
             # if the supplier requires some min qty/uom,

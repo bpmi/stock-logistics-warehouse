@@ -27,7 +27,7 @@ class ProductSupplierinfo(models.Model):
     )
 
     @api.multi
-    @api.depends('product_tmpl_id', 'packaging_id')
+    @api.depends('product_id', 'packaging_id')
     def _compute_product_uom(self):
         """ Set product_uom as a computed field instead of a related field.
             To use uom of link packaging
