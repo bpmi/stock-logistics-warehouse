@@ -10,8 +10,6 @@
             <data>
                 <!-- order_line tree -->
                 <xpath expr="//page//field[@name='order_line']/tree/field[@name='product_id']" position="after">
-<!--                    <field name="product_tmpl_id" invisible="1"/>-->
-<!--                    <field name="packaging_id" domain="[('product_id','=',product_id)]"-->
                     <field name="packaging_id" groups="product.group_stock_packaging"
                            options='{"no_quick_create": True}'/>
                 </xpath>
@@ -20,23 +18,26 @@
                 </xpath>
                 <xpath expr="//page//field[@name='order_line']/tree/field[@name='product_qty']" position="before">
                     <field name="product_purchase_qty"/>
-                    <field name="product_purchase_uom_id" groups="product.group_uom"/>
+                    <field name="product_purchase_uom_id" groups="product.group_uom"
+                           attrs="{'readonly': [('packaging_id', '!=', False)]}"/>
                 </xpath>
                 <xpath expr="//page//field[@name='order_line']/tree/field[@name='product_uom']" position="attributes">
                     <attribute name="attrs">{'readonly' : [('packaging_id', '!=', False)]}</attribute>
                 </xpath>
                 <!-- order_line form -->
                 <xpath expr="//page//field[@name='order_line']/form//field[@name='product_id']" position="after">
-<!--                    <field name="product_tmpl_id" invisible="1"/>-->
-                    <field name="packaging_id" domain="[('product_id','=',product_id)]"
-                           groups="product.group_stock_packaging" options='{"no_quick_create": True}'/>/>
+                    <field name="packaging_id" groups="product.group_stock_packaging"
+                           options='{"no_quick_create": True}'/>
+<!--                    <field name="packaging_id" domain="[('product_id','=',product_id)]"-->
+<!--                           groups="product.group_stock_packaging" options='{"no_quick_create": True}'/>-->
                 </xpath>
                 <xpath expr="//page/field[@name='order_line']/form//field[@name='product_qty']" position="attributes">
                     <attribute name="readonly">1</attribute>
                 </xpath>
                 <xpath expr="//page//field[@name='order_line']/form//field[@name='product_qty']" position="before">
                     <field name="product_purchase_qty"/>
-                    <field name="product_purchase_uom_id" groups="product.group_uom"/>
+                    <field name="product_purchase_uom_id" groups="product.group_uom"
+                           attrs="{'readonly': [('packaging_id', '!=', False)]}"/>
                 </xpath>
                 <xpath expr="//page//field[@name='order_line']/form//field[@name='product_uom']" position="attributes">
                     <attribute name="attrs">{'readonly' : [('packaging_id', '!=', False)]}</attribute>

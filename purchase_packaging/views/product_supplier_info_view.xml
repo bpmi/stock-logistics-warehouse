@@ -23,43 +23,22 @@
         <field name="model">product.supplierinfo</field>
         <field name="inherit_id" ref="product.product_supplierinfo_form_view"/>
         <field name="arch" type="xml">
-            <!-- Members of the Manage Product Packaging group should see the product_id field -->
-<!--            <field name="product_id" position="attributes">-->
-<!--                <attribute name="groups" eval="append">-->
-<!--                    product.group_stock_packaging-->
-<!--                </attribute>-->
-<!--            </field>-->
-<!--            <field name="product_id" position="attributes">-->
-<!--                <attribute name="groups" eval="[(4, ref('product.group_stock_packaging'))]"/>-->
-<!--            </field>-->
-
-
-<!--            <xpath expr="//field[@name='product_id']" position="attributes">-->
-<!--                 <attribute name="groups" eval="append">-->
-<!--                     product.group_stock_packaging-->
-<!--                 </attribute>-->
-<!--            </xpath>-->
-
-
-<!--            <xpath expr="//field[@name='product_id']" position="attributes">-->
-<!--                 <attribute name="groups" eval="[(4, ref('product.group_stock_packaging'))]"/>-->
-<!--            </xpath>-->
-
-
+            <!-- Members of the Manage Product Packaging group needs to see the product_id field -->
+            <!-- Change the display name of the field to Product/Variant to clarify the use of the field -->
             <xpath expr="//field[@name='product_id']" position="attributes">
                 <attribute name="groups">product.group_product_variant, product.group_stock_packaging</attribute>
                 <attribute name="string">Product/Variant</attribute>
             </xpath>
-
             <field name="min_qty" position="after">
-                <span> x <field name="min_qty_uom_id" groups="product.group_uom"/></span>
+                <span groups="product.group_stock_packaging"> x <field name="min_qty_uom_id" groups="product.group_uom"/>
+                </span>
             </field>
             <field name="product_uom" position="before">
-                <span> of </span>
+                <span groups="product.group_stock_packaging"> of </span>
             </field>
             <field name="product_uom" position="after">
                 <div attrs="{'invisible': [('product_id', '!=', False)]}" groups="product.group_stock_packaging">
-                    <!--Product ID is empty. To select or create a Package, wWe need a Product ID and don't have it yet. -->
+                    <!--Product ID is empty. To select or create a Package, we need a Product ID -->
                     <p>Select a Product or Product Variant to display Packages</p>
                 </div>
                 <div attrs="{'invisible': [('product_id', '=', False)]}" groups="product.group_stock_packaging">
@@ -68,6 +47,11 @@
                     <field name="packaging_id" domain="[('product_id', '=', product_id)]"
                            options='{"no_quick_create": True}'/>
                 </div>
+            </field>
+            <field name="price" position="after">
+                <span groups="product.group_stock_packaging"> for each
+                    <field name="product_uom" groups="product.group_uom" attrs="{'readonly': True}"/>
+                </span>
             </field>
 <!--            <field name="delay" position="after">-->
 <!--                <field name="product_tmpl_id" invisible="1" required="False"/>-->
