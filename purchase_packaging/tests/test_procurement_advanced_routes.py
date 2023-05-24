@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2021 ACSONE SA/NV (<http://acsone.eu>)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 import odoo.tests.common as common
@@ -27,14 +26,14 @@ class TestProcurementOrder(common.SavepointCase):
             "rounding": 1.0
         })
         cls.product_packaging_2 = cls.env['product.packaging'].create({
-            'product_tmpl_id': cls.product_test.product_tmpl_id.id,
+            'product_id': cls.product_test.id,
             'uom_id': cls.unit_pair.id,
             'name': 'Packaging Pair'
         })
         # Create supplierinfo for purchase
         vals = {
             "name": cls.env.ref("base.res_partner_2").id,
-            "product_tmpl_id": cls.product_test.product_tmpl_id.id,
+            "product_id": cls.product_test.id,
             "min_qty_uom_id": cls.unit_pair.id,
             "min_qty": 1.0,
         }
@@ -68,7 +67,7 @@ class TestProcurementOrder(common.SavepointCase):
         }
         cls.picking_type_resupply = cls.picking_type_obj.create(vals)
         vals = {
-            "name": "Route Resuply SECOND"
+            "name": "Route Resupply SECOND"
         }
         cls.route_resupply = cls.route_obj.create(vals)
         vals = {
@@ -123,7 +122,7 @@ class TestProcurementOrder(common.SavepointCase):
         cls.product_obj = cls.env['product.product']
         cls.purchase_obj = cls.env["purchase.order"]
         cls.purchase_line_obj = cls.env["purchase.order.line"]
-        cls.procurement_obj = cls.env["procurement.order"]
+        cls.procurement_obj = cls.env["procurement.group"]
         cls.move_obj = cls.env["stock.move"]
 
         cls._create_product()

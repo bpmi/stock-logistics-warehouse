@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2017 ACSONE SA/NV (<http://acsone.eu>)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 import odoo.tests.common as common
@@ -14,17 +13,17 @@ class TestPurchaseOrderLine(common.SavepointCase):
         super(TestPurchaseOrderLine, cls).setUpClass()
         cls.product_supplier_info = cls.env.ref(
             'product.product_supplierinfo_1')
-        cls.product_tmpl_id = cls.product_supplier_info.product_tmpl_id
-        cls.product_supplier_info.product_tmpl_id.uom_po_id = cls.env.ref(
+        cls.product_id = cls.product_supplier_info.product_id
+        cls.product_supplier_info.product_id.uom_po_id = cls.env.ref(
             'product.product_uom_unit')
         cls.product_supplier_info.min_qty = 1
         cls.product_packaging_dozen = cls.env['product.packaging'].create({
-            'product_tmpl_id': cls.product_tmpl_id.id,
+            'product_id': cls.product_id.id,
             'uom_id': cls.env.ref('product.product_uom_dozen').id,
             'name': 'Packaging Dozen'
         })
         cls.product_packaging_unit = cls.env['product.packaging'].create({
-            'product_tmpl_id': cls.product_tmpl_id.id,
+            'product_id': cls.product_id.id,
             'uom_id': cls.env.ref('product.product_uom_unit').id,
             'name': 'Packaging Unit'
         })
@@ -58,7 +57,7 @@ class TestPurchaseOrderLine(common.SavepointCase):
         po = self.env['purchase.order'].create(
             {'partner_id': self.product_supplier_info.name.id})
         po_line = po.order_line.new({
-            'product_id': self.product_tmpl_id.product_variant_id,
+            'product_id': self.product_id,
             'product_purchase_qty': 1.0,
             'product_purchase_uom_id':
                 po.order_line._default_product_purchase_uom_id(),
@@ -94,7 +93,7 @@ class TestPurchaseOrderLine(common.SavepointCase):
         po = self.env['purchase.order'].create(
             {'partner_id': self.product_supplier_info.name.id})
         po_line = po.order_line.new({
-            'product_id': self.product_tmpl_id.product_variant_id,
+            'product_id': self.product_id,
             'product_purchase_qty': 1.0,
             'product_purchase_uom_id':
                 po.order_line._default_product_purchase_uom_id(),
@@ -117,7 +116,7 @@ class TestPurchaseOrderLine(common.SavepointCase):
         po = self.env['purchase.order'].create(
             {'partner_id': self.product_supplier_info.name.id})
         po_line = po.order_line.new({
-            'product_id': self.product_tmpl_id.product_variant_id,
+            'product_id': self.product_id,
             'product_purchase_qty': 1.0,
             'product_purchase_uom_id':
                 po.order_line._default_product_purchase_uom_id(),
@@ -145,7 +144,7 @@ class TestPurchaseOrderLine(common.SavepointCase):
         po = self.env['purchase.order'].create(
             {'partner_id': self.product_supplier_info.name.id})
         po_line = po.order_line.new({
-            'product_id': self.product_tmpl_id.product_variant_id,
+            'product_id': self.product_id,
             'product_purchase_qty': 1.0,
             'product_purchase_uom_id':
                 po.order_line._default_product_purchase_uom_id(),
@@ -173,7 +172,7 @@ class TestPurchaseOrderLine(common.SavepointCase):
         po = self.env['purchase.order'].create(
             {'partner_id': self.product_supplier_info.name.id})
         po_line = po.order_line.new({
-            'product_id': self.product_tmpl_id.product_variant_id,
+            'product_id': self.product_id,
             'product_purchase_qty': 1.0,
             'product_purchase_uom_id':
                 po.order_line._default_product_purchase_uom_id(),
@@ -203,7 +202,7 @@ class TestPurchaseOrderLine(common.SavepointCase):
         po = self.env['purchase.order'].create(
             {'partner_id': self.product_supplier_info.name.id})
         po_line = po.order_line.new({
-            'product_id': self.product_tmpl_id.product_variant_id,
+            'product_id': self.product_id,
             'product_purchase_qty': 1.0,
             'product_purchase_uom_id':
                 po.order_line._default_product_purchase_uom_id(),

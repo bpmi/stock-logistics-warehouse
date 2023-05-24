@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2017 ACSONE SA/NV (<http://acsone.eu>)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 import odoo.tests.common as common
@@ -11,13 +10,12 @@ class TestProductSupplierInfo(common.TransactionCase):
             product_supplierinfo_1'product (uom is product_uom_unit)
         """
         super(TestProductSupplierInfo, self).setUp()
-        self.product_supplier_info = self.env.ref(
-            'product.product_supplierinfo_1')
-        self.product_tmpl_id = self.product_supplier_info.product_tmpl_id
-        self.product_supplier_info.product_tmpl_id.uom_po_id = self.env.ref(
+        self.product_supplier_info = self.env.ref('product.product_supplierinfo_1')
+        self.product_id = self.product_supplier_info.product_id
+        self.product_supplier_info.product_id.uom_po_id = self.env.ref(
             'product.product_uom_unit')
         self.product_packaging_dozen = self.env['product.packaging'].create(
-            {'product_tmpl_id': self.product_tmpl_id.id,
+            {'product_id': self.product_id.id,
              'uom_id': self.env.ref('product.product_uom_dozen').id,
              'name': 'Packaging Dozen'}
         )

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2017 ACSONE SA/NV (<http://acsone.eu>)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 from odoo import api, fields, models
@@ -13,7 +12,7 @@ class ProductSupplierinfo(models.Model):
 
     packaging_id = fields.Many2one(
         'product.packaging',
-        'Logisitical Units'
+        'Packaging'
     )
     product_uom = fields.Many2one(
         compute='_compute_product_uom',
@@ -22,13 +21,13 @@ class ProductSupplierinfo(models.Model):
     )
     min_qty_uom_id = fields.Many2one(
         'product.uom',
-        'Minimal Unit of Measure Quantity',
+        'Minimal Quantity Unit of Measure',
         required=True,
         default=_default_min_qty_uom_id
     )
 
     @api.multi
-    @api.depends('product_tmpl_id', 'packaging_id')
+    @api.depends('product_id', 'packaging_id')
     def _compute_product_uom(self):
         """ Set product_uom as a computed field instead of a related field.
             To use uom of link packaging

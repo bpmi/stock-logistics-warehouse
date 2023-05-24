@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2017 ACSONE SA/NV (<http://acsone.eu>)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 from datetime import timedelta
@@ -27,12 +26,12 @@ class TestProcurementOrder(common.SavepointCase):
         }
         cls.product_test = product_obj.create(vals)
         cls.product_packaging_3 = cls.env['product.packaging'].create({
-            'product_tmpl_id': cls.product_test.product_tmpl_id.id,
+            'product_id': cls.product_test.product_id.id,
             'uom_id': cls.env.ref('product.product_uom_dozen').id,
             'name': 'Packaging Dozen'
         })
         cls.sp_30 = cls.env.ref('product.product_supplierinfo_1')
-        cls.sp_30.product_tmpl_id = cls.product_packaging_3.product_tmpl_id
+        cls.sp_30.product_id = cls.product_packaging_3.product_id
         cls.sp_30.currency_id = cls.env.user.company_id.currency_id
         cls.sp_30.date_start = fields.Datetime.from_string(
             fields.Datetime.now()) - timedelta(days=10)
@@ -55,7 +54,7 @@ class TestProcurementOrder(common.SavepointCase):
         self.product_test.route_ids = [(
             4, self.env.ref("purchase.route_warehouse0_buy").id)]
         self.env.ref('product.product_uom_unit').rounding = 1
-        procurement_obj = self.env['procurement.order']
+        procurement_obj = self.env['procurement.rule']
 
         self.sp_30.min_qty = 0
         self.sp_30.price = 3
@@ -291,7 +290,7 @@ class TestProcurementOrder(common.SavepointCase):
         product.route_ids = [(
             4, self.env.ref("purchase.route_warehouse0_buy").id)]
         self.env.ref('product.product_uom_dozen').rounding = 1
-        procurement_obj = self.env['procurement.order']
+        procurement_obj = self.env['procurement.rule']
 
         self.sp_30.min_qty = 1
         self.sp_30.min_qty_uom_id = self.env.ref('product.product_uom_dozen')
@@ -347,7 +346,7 @@ class TestProcurementOrder(common.SavepointCase):
         product.route_ids = [(
             4, self.env.ref("purchase.route_warehouse0_buy").id)]
         self.env.ref('product.product_uom_dozen').rounding = 1
-        procurement_obj = self.env['procurement.order']
+        procurement_obj = self.env['procurement.rule']
 
         self.sp_30.min_qty = 1
         self.sp_30.min_qty_uom_id = self.env.ref('product.product_uom_dozen')
@@ -406,7 +405,7 @@ class TestProcurementOrder(common.SavepointCase):
         product.route_ids = [(
             4, self.env.ref("purchase.route_warehouse0_buy").id)]
         self.env.ref('product.product_uom_dozen').rounding = 1
-        procurement_obj = self.env['procurement.order']
+        procurement_obj = self.env['procurement.rule']
 
         self.sp_30.min_qty = 1
         self.sp_30.min_qty_uom_id = self.env.ref('product.product_uom_dozen')
@@ -465,7 +464,7 @@ class TestProcurementOrder(common.SavepointCase):
         product.route_ids = [(
             4, self.env.ref("purchase.route_warehouse0_buy").id)]
         self.env.ref('product.product_uom_dozen').rounding = 1
-        procurement_obj = self.env['procurement.order']
+        procurement_obj = self.env['procurement.rule']
 
         self.sp_30.min_qty = 1
         self.sp_30.min_qty_uom_id = self.env.ref('product.product_uom_dozen')
@@ -526,7 +525,7 @@ class TestProcurementOrder(common.SavepointCase):
                    'price': 20,
                    'min_qty_uom_id': uom_kg.id})]})
 
-        procurement_obj = self.env['procurement.order']
+        procurement_obj = self.env['procurement.rule']
         proc1 = procurement_obj.create(
             {'name': 'test_procurement',
              'location_id': self.env.ref('stock.stock_location_stock').id,
@@ -567,7 +566,7 @@ class TestProcurementOrder(common.SavepointCase):
                    'product_uom': uom_20_kg.id,
                    'min_qty_uom_id': uom_20_kg.id})]})
 
-        procurement_obj = self.env['procurement.order']
+        procurement_obj = self.env['procurement.rule']
         proc1 = procurement_obj.create(
             {'name': 'test_procurement',
              'location_id': self.env.ref('stock.stock_location_stock').id,
@@ -609,13 +608,13 @@ class TestProcurementOrder(common.SavepointCase):
                    'product_uom': uom_kg.id})]})
 
         product_packaging_20 = self.env['product.packaging'].create({
-            'product_tmpl_id': product.product_tmpl_id.id,
+            'product_id': product.product_id.id,
             'uom_id': uom_20_kg.id,
             'name': 'Packaging Dozen'
         })
         product.seller_ids[0].packaging_id = product_packaging_20
 
-        procurement_obj = self.env['procurement.order']
+        procurement_obj = self.env['procurement.rule']
         proc1 = procurement_obj.create(
             {'name': 'test_procurement',
              'location_id': self.env.ref('stock.stock_location_stock').id,

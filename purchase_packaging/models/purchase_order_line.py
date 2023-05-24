@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2017 ACSONE SA/NV (<http://acsone.eu>)
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 from odoo import api, fields, models
@@ -12,17 +11,12 @@ class PurchaseOrderLine(models.Model):
     def _default_product_purchase_uom_id(self):
         return self.env.ref('product.product_uom_unit')
 
-    product_tmpl_id = fields.Many2one(
-        related='product_id.product_tmpl_id',
-        comodel_name='product.template',
-        readonly=True
-    )
     packaging_id = fields.Many2one(
         'product.packaging',
         'Packaging'
     )
     product_purchase_qty = fields.Float(
-        'Purchase quantity',
+        'Purchase Quantity',
         digits=dp.get_precision('Product Unit of Measure'),
         required=True, default=lambda *a: 1.0
     )
@@ -105,8 +99,10 @@ class PurchaseOrderLine(models.Model):
     @api.onchange('product_id')
     def onchange_product_id(self):
         """ set domain on product_purchase_uom_id and packaging_id
-            set the first packagigng, purchase_uom and purchase_qty
+            set the first packaging, purchase_uom and purchase_qty
         """
+        packaging_ids = []
+        min_qty_uom_ids = []
         domain = {}
         # call default implementation
         # restore default values
@@ -118,19 +114,30 @@ class PurchaseOrderLine(models.Model):
             defaults.get('product_purchase_uom_id', []))
         # add default domains
         if self.product_id and self.partner_id:
-            domain['packaging_id'] = [
-                ('id', 'in', self.product_id.mapped(
-                    'seller_ids.packaging_id.id'))]
-            domain['product_purchase_uom_id'] = \
-                [('id', 'in', self.product_id.mapped(
-                    'seller_ids.min_qty_uom_id.id'))]
+            # search() for a recordset from product_supplierinfo with entries that
+            # match the current product and supplier, and then use the mapped()
+            # method to create a list of the packaging_ids
+            # NOTE: Previous versions used:
+            # self.product_id.mapped('seller_ids.min_qty_uom_id.id')
+            # but with the change to product_packaging using product_id instead
+            # of product_tmpl_id this no longer works.
+            product_sellers = self.env['product.supplierinfo'].search(
+                ['&', ('product_id', '=', self.product_id.id),
+                 ('name', '=', self.partner_id.id)])
+
+            packaging_ids = product_sellers.mapped('packaging_id.id')
+            min_qty_uom_ids = product_sellers.mapped('min_qty_uom_id.id')
+
+        domain['packaging_id'] = [('id', 'in', packaging_ids)]
+        domain['product_purchase_uom_id'] = [('id', 'in', min_qty_uom_ids)]
+
         res = super(PurchaseOrderLine, self).onchange_product_id()
         if self.product_id:
             supplier = self._get_product_seller()
         else:
             supplier = self.product_id.seller_ids.browse([])
         if supplier.product_uom:
-            # use the uom from the suppleir
+            # use the uom from the supplier
             self.product_uom = supplier.product_uom
         if supplier.min_qty_uom_id:
             # if the supplier requires some min qty/uom,
