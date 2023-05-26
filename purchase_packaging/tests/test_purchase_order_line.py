@@ -11,8 +11,34 @@ class TestPurchaseOrderLine(common.SavepointCase):
             product_supplierinfo_1'product (uom is product_uom_unit)
         """
         super(TestPurchaseOrderLine, cls).setUpClass()
-        cls.product_supplier_info = cls.env.ref(
-            'product.product_supplierinfo_1')
+
+        # Create a product
+        cls.product_obj = cls.env['product.product']
+        vals = {
+            'name': 'Test Product',
+            'categ_id': cls.env.ref('product.product_category_all').id,
+            'list_price': 30.0,
+            'standard_price': 20.0,
+            'type': 'product',
+        }
+        cls.product_test = cls.product_obj.create(vals)
+
+        # Create a vendor and a supplierinfo
+        cls.vendor1 = cls.env['res.partner'].create({'name': 'vendor1'})
+        cls.product_supplier_info = cls.env['product.supplierinfo'].create({
+            'name': cls.vendor1.id,
+            'price': 15,
+            'product_id': cls.product_test.id,
+            'product_tmpl_id': cls.product_test.product_tmpl_id.id,
+        })
+
+
+
+        # cls.product_supplier_info = cls.env.ref(
+        #     'product.product_supplierinfo_1')
+        # cls.product_id = cls.env.ref('product.product_product_3')
+        # cls.product_supplier_info.write({'product_id': cls.product_id.id})
+        # cls.product_supplier_info.write({'product_id': cls.env.ref('product.product_product_3').id})
         cls.product_id = cls.product_supplier_info.product_id
         cls.product_supplier_info.product_id.uom_po_id = cls.env.ref(
             'product.product_uom_unit')
@@ -54,6 +80,31 @@ class TestPurchaseOrderLine(common.SavepointCase):
         self.product_supplier_info.min_qty = 2
         self.product_supplier_info.packaging_id = self.product_packaging_dozen
 
+        # self.po_vals = {
+        #     'partner_id': self.self.product_supplier_info.name.id,
+        #     'order_line': [
+        #         (0, 0, {
+        #             'name': self.product_id.name,
+        #             'product_id': self.product_id.id,
+        #             'product_purchase_qty': 1.0,
+        #             'product_purchase_uom_id': ,
+        #             'product_qty': 5.0,
+        #             'product_uom': self.product_id_1.uom_po_id.id,
+        #             'price_unit': 500.0,
+        #             'date_planned': datetime.today().strftime(
+        #                 DEFAULT_SERVER_DATETIME_FORMAT),
+        #         }),
+        #         (0, 0, {
+        #             'name': self.product_id_2.name,
+        #             'product_id': self.product_id_2.id,
+        #             'product_qty': 5.0,
+        #             'product_uom': self.product_id_2.uom_po_id.id,
+        #             'price_unit': 250.0,
+        #             'date_planned': datetime.today().strftime(
+        #                 DEFAULT_SERVER_DATETIME_FORMAT),
+        #         })],
+        # }
+
         po = self.env['purchase.order'].create(
             {'partner_id': self.product_supplier_info.name.id})
         po_line = po.order_line.new({
@@ -77,7 +128,8 @@ class TestPurchaseOrderLine(common.SavepointCase):
             {name: po_line[name] for name in po_line._cache})
         po.order_line.create(values)
         # check that all the packaging informations are on the created picking
-        po._create_picking()
+        po.button_confirm()
+        # po._create_picking()
         sm = po.picking_ids[0].move_lines[0]
         self.assertEqual(sm.product_packaging.id,
                          self.product_packaging_dozen.id)
